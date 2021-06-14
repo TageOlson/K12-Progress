@@ -20,9 +20,9 @@ public class LifeKeeper : MonoBehaviour
     {
         --lives;
         livesText.text = lives.ToString();
-        if(lives > 0)
-        {
-            var newPlayer = Instantiate(playerPrefab, respawnPosition, Quaternion.identity);
-        }
+        //if(lives > 0)
+       //{
+       //    var newPlayer = Instantiate(playerPrefab, respawnPosition, Quaternion.identity);
+       //}
     }
 }

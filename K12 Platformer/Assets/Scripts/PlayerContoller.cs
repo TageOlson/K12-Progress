@@ -13,6 +13,7 @@ public class PlayerContoller : MonoBehaviour
     [SerializeField] float jumpSpeedMultiplier = 1.25f;
     [Range(0, 0.05f)] [SerializeField] float jumpDamping = 0.005f;
     bool isGrounded = false;
+    private Vector2 StartPos;
 
     // Start is called before the first frame update
     void Start()
@@ -20,6 +21,7 @@ public class PlayerContoller : MonoBehaviour
         myCollider= GetComponent<Collider2D>();
         myRigidbody = GetComponent<Rigidbody2D>();
         theLifeKeeper = FindObjectOfType<LifeKeeper>();
+        StartPos = myRigidbody.position;
     }
 
     // Update is called once per frame
@@ -45,6 +47,7 @@ public class PlayerContoller : MonoBehaviour
             playerVelocity.x = controlDirection * runSpeed;
         }
         playerVelocity.x = Mathf.Clamp(playerVelocity.x, -runSpeed, runSpeed);
+        //playerVelocity.y = Mathf.Clamp(playerVelocity.y, 10 * -runSpeed, 10 * runSpeed); //limiting fall speed
         myRigidbody.velocity = playerVelocity;
     }
     private void Jump()
@@ -68,11 +71,13 @@ public class PlayerContoller : MonoBehaviour
         {//moving up and not holding jump, short hop
             myRigidbody.velocity += Vector2.up * Physics2D.gravity.y * jumpSpeedMultiplier * Time.deltaTime;
         }
+
     }
     private void OnTriggerEnter2D(Collider2D collision)
     {
         theLifeKeeper.DecreaseLives();
-        Destroy(gameObject);
+        myRigidbody.position = StartPos;
+        //Destroy(gameObject);
     }
     private void GroundCheck()
     {
