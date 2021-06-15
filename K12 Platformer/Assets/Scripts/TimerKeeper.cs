@@ -39,4 +39,8 @@ public class TimerKeeper : MonoBehaviour
         Destroy(player.gameObject);
         }
     }
+    public void AddTime(int timeToAdd)
+    {
+        time += timeToAdd;
+    }
 }

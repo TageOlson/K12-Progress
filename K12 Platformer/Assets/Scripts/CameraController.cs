@@ -37,19 +37,8 @@ public class CameraController : MonoBehaviour
         if(Mathf.Abs(yDiff)>= DeadZone.y)
         {
             newPos.y = follow.y;
-        }
-      // newPos.x = Mathf.Lerp(transform.position.x, newPos.x, SmoothingSpeed * Time.deltaTime);
-      // newPos.y = Mathf.Lerp(transform.position.y, newPos.y, camSpeed * Time.deltaTime);
-        //       
+        }       
         transform.position = Vector3.MoveTowards(transform.position, newPos, SmoothingSpeed * Time.deltaTime);
-        //float yPos, yNew;
-        //float xPos, xNew;
-        //Mathf.MoveTowards(xPos, xNew, SmoothingSpeed * Time.deltaTime);
-        //Vector3 targetPos = RB_followObject.position + followOffset;
-        //targetPos.z = -10f;
-        
-        //Vector3 smoothPos = Vector3.Lerp(transform.position, targetPos, SmoothingSpeed *Time.fixedDeltaTime);
-        //transform.position = targetPos;
     }
     private Vector3 findZone()
     {
@@ -65,6 +54,9 @@ public class CameraController : MonoBehaviour
         Gizmos.color = Color.magenta;
         Vector2 border = findZone();
         Gizmos.DrawWireCube(transform.position, new Vector3(2 * border.x, 2 * border.y, 1));
-
+    }
+    public void SnapTo()
+    {
+        transform.position = new Vector3(RB_followObject.position.x+DeadZone.x, RB_followObject.position.y+DeadZone.y,transform.position.z);
     }
 }

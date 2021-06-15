@@ -7,13 +7,15 @@ public class PlayerContoller : MonoBehaviour
     Collider2D myCollider;
     Rigidbody2D myRigidbody;
     LifeKeeper theLifeKeeper;
+    CameraController gameCamera;
     [SerializeField] float runSpeed = 5f;
     [SerializeField] float jumpSpeed = 8f;
     [SerializeField] float fallSpeedMultiplier = 1.5f;
     [SerializeField] float jumpSpeedMultiplier = 1.25f;
     [Range(0, 0.05f)] [SerializeField] float jumpDamping = 0.005f;
-    bool isGrounded = false;
-    private Vector2 StartPos;
+    [SerializeField] bool isGrounded = false;
+    public Vector2 RespawnPosition;
+    private float initialScaleH; //for sprite flipping
 
     // Start is called before the first frame update
     void Start()
@@ -21,7 +23,10 @@ public class PlayerContoller : MonoBehaviour
         myCollider= GetComponent<Collider2D>();
         myRigidbody = GetComponent<Rigidbody2D>();
         theLifeKeeper = FindObjectOfType<LifeKeeper>();
-        StartPos = myRigidbody.position;
+        gameCamera = FindObjectOfType<CameraController>();
+        RespawnPosition = myRigidbody.position;
+
+        initialScaleH = Mathf.Abs(transform.localScale.x);
     }
 
     // Update is called once per frame
@@ -31,6 +36,7 @@ public class PlayerContoller : MonoBehaviour
         Run();
         Jump();
         SmoothJumping();
+        SpriteUpdate();
     }
     private void Run()
     {
@@ -47,7 +53,7 @@ public class PlayerContoller : MonoBehaviour
             playerVelocity.x = controlDirection * runSpeed;
         }
         playerVelocity.x = Mathf.Clamp(playerVelocity.x, -runSpeed, runSpeed);
-        //playerVelocity.y = Mathf.Clamp(playerVelocity.y, 10 * -runSpeed, 10 * runSpeed); //limiting fall speed
+        playerVelocity.y = Mathf.Clamp(playerVelocity.y, 5 * -runSpeed, 5 * runSpeed); //limiting fall speed
         myRigidbody.velocity = playerVelocity;
     }
     private void Jump()
@@ -74,13 +80,34 @@ public class PlayerContoller : MonoBehaviour
 
     }
     private void OnTriggerEnter2D(Collider2D collision)
-    {
-        theLifeKeeper.DecreaseLives();
-        myRigidbody.position = StartPos;
-        //Destroy(gameObject);
+    {   
+        if(collision.CompareTag("Danger"))
+        {
+            theLifeKeeper.DecreaseLives();
+            myRigidbody.position = RespawnPosition;
+            gameCamera.SnapTo();
+            myRigidbody.velocity = new Vector3(0,0,0);
+        }
+        Debug.Log(collision.CompareTag("Collectable"));
     }
     private void GroundCheck()
     {
         isGrounded = myCollider.IsTouchingLayers(LayerMask.GetMask("Ground"));
+    }
+    private void SpriteUpdate()
+    { //sprite faces last direction faced on ground
+    if(isGrounded)
+    {
+        Vector3 spriteScale = transform.localScale;
+        if(myRigidbody.velocity.x > 0)
+        {
+            spriteScale.x = initialScaleH;
+        }
+        if(myRigidbody.velocity.x < 0)
+        {
+            spriteScale.x = -initialScaleH;
+        }
+        transform.localScale = spriteScale;
+        }
     }
 }
