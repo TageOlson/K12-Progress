@@ -8,6 +8,7 @@ public class PlayerContoller : MonoBehaviour
     Rigidbody2D myRigidbody;
     LifeKeeper theLifeKeeper;
     CameraController gameCamera;
+    AudioManager playerAudio;
     [SerializeField] float runSpeed = 5f;
     [SerializeField] float jumpSpeed = 8f;
     [SerializeField] float fallSpeedMultiplier = 1.5f;
@@ -24,6 +25,7 @@ public class PlayerContoller : MonoBehaviour
         myRigidbody = GetComponent<Rigidbody2D>();
         theLifeKeeper = FindObjectOfType<LifeKeeper>();
         gameCamera = FindObjectOfType<CameraController>();
+        playerAudio = FindObjectOfType<AudioManager>();
         RespawnPosition = myRigidbody.position;
 
         initialScaleH = Mathf.Abs(transform.localScale.x);
@@ -45,7 +47,6 @@ public class PlayerContoller : MonoBehaviour
         if(!isGrounded)
         { //less movement in air
             playerVelocity.x += (controlDirection * runSpeed * .3f *jumpDamping);
-            //Debug.Log(playerVelocity.x);
             playerVelocity.x = Mathf.Lerp(playerVelocity.x, 0f, .5f * jumpDamping);//prevents horizontal movement from going too far in the air
         }
         else
@@ -65,6 +66,7 @@ public class PlayerContoller : MonoBehaviour
         if(Input.GetButtonDown("Jump")) // spacebar
         {
             myRigidbody.velocity = Vector2.up * jumpSpeed;
+            playerAudio.PlaySound("PlayerJump");
         }
     }
     private void SmoothJumping()
@@ -87,12 +89,17 @@ public class PlayerContoller : MonoBehaviour
             myRigidbody.position = RespawnPosition;
             gameCamera.SnapTo();
             myRigidbody.velocity = new Vector3(0,0,0);
+            playerAudio.PlaySound("Die2");
         }
-        Debug.Log(collision.CompareTag("Collectable"));
     }
     private void GroundCheck()
     {
+        bool sndSwitch = isGrounded;
         isGrounded = myCollider.IsTouchingLayers(LayerMask.GetMask("Ground"));
+        if(sndSwitch != isGrounded && isGrounded)
+        {
+            playerAudio.PlaySound("Thump");
+        }
     }
     private void SpriteUpdate()
     { //sprite faces last direction faced on ground

@@ -18,6 +18,7 @@ public class PIckup : MonoBehaviour
         {
             theScoreKeeper.IncreaseScore(pointValue);
             Destroy(gameObject);
+            FindObjectOfType<AudioManager>().PlaySound("Collect");
         }
     }
 }
